@@ -5,9 +5,9 @@
 #include "arch.h"
 #include "bit.h"
 
-#define imm_bit     1
+#define imm_bit     1u
 #define imm_msk     pw2m(imm_bit)
-#define type_bit    3
+#define type_bit    3u
 #define type_msk    pw2m(type_bit)
 
 typedef enum {
@@ -56,12 +56,20 @@ typedef union {
 } term_t;
 
 
+static inline raw_t imm2raw(imm_t imm) {
+    return (raw_t)(imm>>imm_bit);
+}
+
+static inline imm_t raw2imm(raw_t raw) {
+    return (imm_t)(raw<<imm_bit);
+}
+
 static inline tflg_t tflg(tref_t ref) { return (-(ref.raw & imm_msk)) & (ref.raw & type_msk); }
-static inline imm_t imm(tref_t ref) { return (imm_t)(ref.raw>>imm_bit); }
+static inline imm_t imm(tref_t ref) { return raw2imm(ref.raw); }
 static inline term_t *term(tref_t ref) { return (term_t *)(ref.raw & (~type_msk)); }
 
 static inline tref_t shift_imm(tref_t ref, imm_t d) {
-    ref.raw += d<<imm_bit;
+    ref.raw += raw2imm((raw_t)d);
     return ref;
 }
 
@@ -73,7 +81,7 @@ static inline tref_t type(tref_t ref) { return term(ref)->abst.type; }
 
 static inline tref_t expr(tref_t ref) { return term(ref)->abst.expr; }
 
-static inline tref_t talloc(tflg_t tflg){
+static inline tref_t alloc_tref(tflg_t tflg){
     tref_t ref;
     ref.raw = (raw_t)malloc(sizeof(term_t));
     ref.raw |= tflg;
@@ -98,5 +106,13 @@ typedef struct {
     scope_t scope;
     vect_t vect;
 } ctx_t;
+
+static inline vect_t *alloc_vect(u_t n) {
+    vect_t *vect = (vect_t*)malloc(sizeof(vect_t));
+    vect->app = alloc_bv(n);
+    vect->abst = alloc_bv(n);
+    vect->prod = alloc_bv(n);
+    return vect;
+}
 
 #endif /*_DEPT_H_*/

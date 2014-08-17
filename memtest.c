@@ -2,12 +2,12 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <limits.h>
 int main(void) {
     int *p;
     int i;
     for (i = 0;i < 100; i++) {
-        p = malloc(sizeof(int));
-        printf("%llx\n",(uint64_t)p);
+        printf("%llx\n",INTMAX_MIN);
     }
     return 0;
 }

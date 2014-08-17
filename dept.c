@@ -60,7 +60,7 @@ tref_t copy_term(tref_t r) {
     case tflg_app:
     case tflg_abst:
     case tflg_prod:
-        nr = talloc(tflg(r));
+        nr = alloc_tref(tflg(r));
         car(nr) = copy_term(car(r));
         cdr(nr) = copy_term(cdr(r));
         break;
@@ -88,9 +88,9 @@ tref_t subst_all(imm_t n, tref_t r, tref_t s) {
 }
 
 int main(int argc, char *argv[]) {
-    tref_t top;
-    top.tflg = tflg_hole;
-    bvalloc(MAX_DEPTH);
+    tref_t top = {tflg_hole};
+    vect_t *vect = alloc_vect(MAX_DEPTH);
+    printf("%jx\n",top.raw);
     return 0;
 }
 
